@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111b2b">
+  <meta name="description" content="LifeRadar ผู้ช่วยจัดการรายจ่าย จับ subscription ที่ลืม และวางแผนเงินแบบเข้าใจง่าย">
+  <title>LifeRadar — เงินไม่หาย ชีวิตไม่หล่น</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="#overview" class="brand" aria-label="LifeRadar หน้าแรก">
+        <span class="brand-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/><path d="M24 24 37 11M29 11h8v8" fill="none" stroke="#caff69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="3.5" fill="#caff69"/></svg></span>
+        <span class="brand-name">Life<span>Radar</span><small>YOUR LIFE, IN CONTROL</small></span>
+      </a>
+      <div class="side-label">ภาพรวมชีวิต</div>
+      <nav class="nav-list" aria-label="เมนูหลัก">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">◈</span> ภาพรวมวันนี้ <span class="nav-pip"></span></button>
+        <button class="nav-item" data-view="expenses"><span class="nav-icon">↗</span> รายรับ–รายจ่าย</button>
+        <button class="nav-item" data-view="subscriptions"><span class="nav-icon">⟳</span> Subscription <span id="nav-sub-count" class="nav-count">0</span></button>
+        <button class="nav-item" data-view="insights"><span class="nav-icon">✳</span> อินไซต์ของฉัน</button>
+      </nav>
+      <div class="side-label side-label-spaced">จัดการ</div>
+      <nav class="nav-list">
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> ตั้งค่าและข้อมูล</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-card"><span class="privacy-icon">⌑</span><div><strong>ข้อมูลเป็นของคุณ</strong><p>บันทึกไว้ในเบราว์เซอร์นี้ ไม่ส่งไปเซิร์ฟเวอร์</p></div></div>
+        <div class="profile-row"><div class="avatar">🌱</div><div class="profile-copy"><strong>พื้นที่ของฉัน</strong><span>ค่อย ๆ ดีขึ้นทุกวัน</span></div><span class="profile-dots">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark small-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" stroke="currentColor" stroke-width="2"/><path d="M24 24 37 11M29 11h8v8" fill="none" stroke="#caff69" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.5" fill="#caff69"/></svg></span>LifeRadar</div>
+        <div class="breadcrumb"><span class="breadcrumb-muted">พื้นที่ของฉัน</span><span class="crumb-slash">/</span><strong id="breadcrumb-title">ภาพรวมวันนี้</strong></div>
+        <div class="top-actions"><div class="today-chip"><span class="live-dot"></span><span id="today-label">วันนี้</span></div><button class="icon-button" id="export-quick" title="สำรองข้อมูล" aria-label="สำรองข้อมูล">↧</button><button class="top-avatar" title="พื้นที่ของฉัน">🌱</button></div>
+      </header>
+
+      <section class="view-panel active" id="view-overview" data-panel="overview">
+        <div class="welcome-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR DAILY RADAR</div><h1 id="greeting-title">สวัสดี วันนี้เรามาจัดการเงินกัน ✨</h1><p class="subheading">เรื่องเงินไม่ต้องเป๊ะทุกวัน แค่เห็นภาพชัดขึ้นวันละนิดก็พอ</p></div><button class="button button-primary" id="quick-expense"><span>＋</span> บันทึกรายการ</button></div>
+        <div class="demo-banner" id="demo-banner"><span class="demo-spark">✦</span><span><strong>คุณกำลังดูข้อมูลตัวอย่าง</strong> — ลองกดเล่นได้ทุกอย่าง หรือเริ่มบันทึกข้อมูลจริงของคุณ</span><button id="start-real-data">เริ่มใช้จริง <span>→</span></button></div>
+
+        <section class="hero-card">
+          <div class="hero-copy"><div class="hero-topline"><span class="hero-kicker">YOUR MONEY, YOUR MOVES</span><span class="hero-date" id="hero-month">ตุลาคม 2569</span></div><h2>เงินของคุณ<br>ควร <span>อยู่ในการควบคุม</span></h2><p>มองให้เห็นว่าเงินไปไหน ก่อนที่มันจะค่อย ๆ หายไปโดยไม่รู้ตัว</p><div class="hero-stats"><div><span class="hero-stat-label">รายจ่ายที่บันทึกเดือนนี้</span><strong id="hero-expenses">฿0</strong><span class="hero-stat-note" id="hero-expense-note">เริ่มบันทึกเพื่อเห็นภาพจริง</span></div><div class="hero-divider"></div><div><span class="hero-stat-label">ภาระ Subscription / เดือน</span><strong id="hero-subscriptions">฿0</strong><span class="hero-stat-note">รวมแพ็กเกจที่ยังใช้งาน</span></div></div><div class="hero-buttons"><button class="button button-lime" id="hero-add-expense">＋ เพิ่มรายจ่าย</button><button class="button button-glass" id="hero-review-subs">ตรวจ Subscription <span>↗</span></button></div></div>
+          <div class="hero-visual" aria-label="ภาพประกอบเรดาร์การเงิน"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="radar-sweep"></div><div class="radar-center"><span>฿</span><small>RADAR</small></div><div class="orbit-tag tag-one"><span class="tag-dot lime-dot"></span><span><small>รายจ่าย</small><strong id="radar-spend">฿0</strong></span></div><div class="orbit-tag tag-two"><span class="tag-dot coral-dot"></span><span><small>เงินที่อาจประหยัดได้/ปี</small><strong id="radar-save">฿0</strong></span></div><div class="orbit-star star-one">✦</div><div class="orbit-star star-two">✧</div></div>
+        </section>
+
+        <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> THE BIG PICTURE</div><h2>ภาพรวมที่ควรรู้ <span class="heading-period">· เดือนนี้</span></h2></div><button class="text-button" data-goto="insights">ดูอินไซต์ทั้งหมด <span>→</span></button></div>
+        <div class="metric-grid">
+          <article class="metric-card metric-mint"><div class="metric-top"><span class="metric-icon">↘</span><span class="metric-label">รายจ่ายที่บันทึก</span><span class="metric-corner">01</span></div><div class="metric-value" id="metric-expenses">฿0</div><div class="metric-foot"><span class="metric-foot-dot"></span><span id="metric-expense-caption">รวมรายการจ่ายเดือนนี้</span></div><div class="metric-sparkline spark-mint"><i style="height:35%"></i><i style="height:58%"></i><i style="height:43%"></i><i style="height:76%"></i><i style="height:54%"></i><i style="height:90%"></i><i style="height:66%"></i><i style="height:100%"></i></div></article>
+          <article class="metric-card metric-lilac"><div class="metric-top"><span class="metric-icon">⟳</span><span class="metric-label">Subscription / ปี</span><span class="metric-corner">02</span></div><div class="metric-value" id="metric-subs-year">฿0</div><div class="metric-foot"><span class="metric-foot-dot lilac-dot"></span><span id="metric-subs-caption">เงินที่ผูกพันตลอดปี</span></div><div class="metric-sparkline spark-lilac"><i style="height:45%"></i><i style="height:30%"></i><i style="height:52%"></i><i style="height:65%"></i><i style="height:44%"></i><i style="height:79%"></i><i style="height:62%"></i><i style="height:100%"></i></div></article>
+          <article class="metric-card metric-peach"><div class="metric-top"><span class="metric-icon">◉</span><span class="metric-label">กำลังจะตัดเงิน</span><span class="metric-corner">03</span></div><div class="metric-value" id="metric-upcoming">฿0</div><div class="metric-foot"><span class="metric-foot-dot peach-dot"></span><span id="metric-upcoming-caption">ใน 7 วันข้างหน้า</span></div><div class="metric-sparkline spark-peach"><i style="height:32%"></i><i style="height:43%"></i><i style="height:30%"></i><i style="height:58%"></i><i style="height:52%"></i><i style="height:72%"></i><i style="height:64%"></i><i style="height:100%"></i></div></article>
+          <article class="metric-card metric-blue"><div class="metric-top"><span class="metric-icon">✳</span><span class="metric-label">อาจลดรายจ่ายได้</span><span class="metric-corner">04</span></div><div class="metric-value" id="metric-savings">฿0</div><div class="metric-foot"><span class="metric-foot-dot blue-dot"></span><span>ต่อปี · จากบริการที่ใช้น้อย</span></div><div class="metric-action"><button class="mini-link" data-goto="subscriptions">ตรวจดูเลย ↗</button></div></article>
+        </div>
+
+        <div class="content-grid dashboard-middle">
+          <section class="panel spending-panel"><div class="panel-heading"><div><div class="panel-label">SPENDING BREAKDOWN</div><h3>เงินออกไปกับอะไรบ้าง?</h3><p>จากรายการที่คุณบันทึกจริงในเดือนนี้</p></div><span class="panel-icon panel-icon-green">◒</span></div><div id="category-chart" class="category-chart"></div><div class="chart-legend-bottom"><span><i class="legend-dot dot-green"></i> รายจ่ายตามหมวดหมู่</span><button class="mini-link" data-goto="expenses">ดูรายการทั้งหมด →</button></div></section>
+          <section class="panel daily-panel"><div class="daily-orb"><span>✦</span></div><div class="panel-label">A SMALL WIN TODAY</div><h3>ภารกิจเงินวันนี้</h3><p id="daily-prompt">ใช้เวลาแค่ 60 วินาที เช็กสิ่งเล็ก ๆ ที่ช่วยให้คุณคุมเงินได้ดีขึ้น</p><div class="daily-task-row"><span class="task-check" id="task-check-icon">✓</span><span id="daily-task-label">เช็กรายจ่ายหรือวันตัด Subscription สัก 1 อย่าง</span></div><button class="button button-dark full-button" id="daily-checkin"><span>✓</span> เช็กอินวันนี้ <span class="button-arrow">→</span></button><div class="streak-line"><span>✦ <strong id="streak-count">0 วัน</strong> streak</span><span id="checkin-message">ทำวันละนิดก็เปลี่ยนได้</span></div></section>
+        </div>
+
+        <div class="content-grid dashboard-bottom">
+          <section class="panel upcoming-panel"><div class="panel-heading"><div><div class="panel-label">COMING UP</div><h3>อะไรจะตัดเงินเร็ว ๆ นี้</h3><p>ช่วยให้เตรียมเงินไว้ ไม่เซอร์ไพรส์ปลายเดือน</p></div><button class="panel-more" data-goto="subscriptions" aria-label="ดู Subscription ทั้งหมด">↗</button></div><div id="upcoming-list" class="upcoming-list"></div><div class="panel-footer"><span>รวมยอดใน 7 วัน</span><strong id="upcoming-total-footer">฿0</strong></div></section>
+          <section class="panel leak-panel"><div class="leak-header"><div><div class="panel-label">SUBSCRIPTION CHECK</div><h3>เงินรั่วที่อาจมองข้าม</h3></div><span class="leak-symbol">⌁</span></div><div class="leak-amount" id="leak-annual">฿0<span>/ปี</span></div><p id="leak-summary">เพิ่มบริการที่สมัครไว้ แล้วเราจะช่วยคำนวณให้เห็นภาพ</p><div id="leak-mini-list" class="leak-mini-list"></div><button class="button button-outline full-button" data-goto="subscriptions">ตรวจบริการที่ใช้น้อย <span>→</span></button></section>
+        </div>
+        <footer class="app-footer"><span>LifeRadar <span class="footer-spark">✦</span> ให้เงินเป็นเรื่องที่เข้าใจง่ายขึ้น</span><span>ข้อมูลส่วนตัวเก็บในอุปกรณ์ของคุณ</span></footer>
+      </section>
+
+      <section class="view-panel" id="view-expenses" data-panel="expenses" hidden>
+        <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> MONEY IN / MONEY OUT</div><h1>ทุกบาทมีที่ไป <span class="heading-emoji">↗</span></h1><p class="subheading">บันทึกง่าย เห็นภาพชัด ไม่ต้องเป็นนักบัญชีก็เข้าใจเงินตัวเองได้</p></div><button class="button button-primary" id="expense-add-page">＋ เพิ่มรายการ</button></div>
+        <div class="ledger-summary-grid"><div class="ledger-stat income-stat"><span>รายรับเดือนนี้</span><strong id="ledger-income">฿0</strong><small>เงินที่บันทึกเข้ามา</small></div><div class="ledger-stat expense-stat"><span>รายจ่ายเดือนนี้</span><strong id="ledger-expenses">฿0</strong><small>เงินที่บันทึกออกไป</small></div><div class="ledger-stat balance-stat"><span>คงเหลือจากที่บันทึก</span><strong id="ledger-balance">฿0</strong><small>รายรับ − รายจ่าย (ยังไม่หักภาระอนาคต)</small></div></div>
+        <section class="panel ledger-panel"><div class="ledger-toolbar"><div><h3>รายการของฉัน</h3><p id="ledger-count">รายการทั้งหมด</p></div><div class="toolbar-controls"><input id="ledger-search" class="search-input" type="search" placeholder="ค้นหารายการ…" aria-label="ค้นหารายการ"><select id="ledger-filter" class="select-input" aria-label="กรองรายการ"><option value="all">ทั้งหมด</option><option value="expense">รายจ่าย</option><option value="income">รายรับ</option></select></div></div><div id="transaction-list" class="transaction-list"></div><div id="ledger-empty" class="empty-state" hidden><div class="empty-illustration">✳</div><h3>ทุกการเปลี่ยนแปลงเริ่มจากการมองเห็น</h3><p>บันทึกรายการแรก แล้ว LifeRadar จะเริ่มช่วยสรุปภาพการเงินของคุณ</p><button class="button button-primary" id="empty-add-expense">＋ บันทึกรายการแรก</button></div></section>
+      </section>
+
+      <section class="view-panel" id="view-subscriptions" data-panel="subscriptions" hidden>
+        <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> RECURRING EXPENSES</div><h1>Subscription ที่คุณมี <span class="heading-emoji">⟳</span></h1><p class="subheading">บริการละนิดรวมกันอาจเป็นเงินก้อนใหญ่ มาเช็กให้ชัดว่าอันไหนคุ้ม</p></div><button class="button button-primary" id="subscription-add-page">＋ เพิ่มบริการ</button></div>
+        <section class="subscription-hero"><div><div class="panel-label">THE REAL COST OF SUBSCRIPTIONS</div><h2>สมัครนิดเดียว<br><span>รวมทั้งปีไม่ได้นิดเลย</span></h2><p>เห็นยอดรายเดือน รายปี วันตัดเงิน และบริการที่อาจไม่คุ้มในหน้าจอเดียว</p></div><div class="subscription-total-wrap"><span>ภาระต่อเดือน</span><strong id="sub-page-monthly">฿0</strong><div class="total-divider"></div><span>คิดเป็นต่อปี</span><strong class="annual-number" id="sub-page-annual">฿0</strong></div><div class="subscription-orbit">⟳</div></section>
+        <div class="subscription-filter-row"><div><h3>บริการทั้งหมด <span id="sub-total-count" class="count-pill">0</span></h3><p>แตะ “ใช้น้อย” เพื่อดูจุดที่อาจประหยัดได้</p></div><div class="sub-filters"><button class="filter-chip active" data-sub-filter="all">ทั้งหมด</button><button class="filter-chip" data-sub-filter="review">ควรทบทวน</button><button class="filter-chip" data-sub-filter="upcoming">ใกล้ตัดเงิน</button></div></div>
+        <div id="subscription-grid" class="subscription-grid"></div><div id="subscription-empty" class="empty-state" hidden><div class="empty-illustration">⟳</div><h3>มาสำรวจเงินที่จ่ายซ้ำกัน</h3><p>ใส่บริการสตรีมมิง พื้นที่เก็บข้อมูล แอป หรือสมาชิกที่จ่ายเป็นประจำ</p><button class="button button-primary" id="empty-add-sub">＋ เพิ่ม Subscription แรก</button></div>
+        <section class="panel subscription-tip"><div class="tip-icon">✦</div><div><div class="panel-label">LIFERADAR TIP</div><h3>ก่อนยกเลิก ลองเช็ก 3 อย่างนี้</h3><p>ดูว่ามีค่าปรับหรือสัญญาขั้นต่ำหรือไม่ · วันต่ออายุอยู่เมื่อไร · มีข้อมูลหรือสิทธิ์ที่ต้องสำรองก่อนยกเลิกไหม</p></div></section>
+      </section>
+
+      <section class="view-panel" id="view-insights" data-panel="insights" hidden>
+        <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PATTERNS, NOT JUDGEMENT</div><h1>อินไซต์ของคุณ <span class="heading-emoji">✳</span></h1><p class="subheading">ไม่ได้มาจับผิด แต่มาช่วยหาจุดเล็ก ๆ ที่ทำให้ชีวิตการเงินดีขึ้น</p></div><div class="insight-date-pill" id="insight-month">เดือนนี้</div></div>
+        <div class="insight-hero"><div><span class="insight-hero-label">YOUR MONTH, IN A SENTENCE</span><h2 id="insight-headline">เริ่มจากการเห็นภาพ แล้วค่อยเลือกสิ่งที่เปลี่ยนได้</h2><p id="insight-summary">บันทึกรายรับ รายจ่าย และ Subscription เพื่อให้ LifeRadar วิเคราะห์จากข้อมูลของคุณจริง ๆ</p></div><div class="insight-hero-icon">◉<span>✦</span></div></div>
+        <div class="content-grid insights-grid"><section class="panel"><div class="panel-heading"><div><div class="panel-label">WHERE IT GOES</div><h3>หมวดที่ใช้เงินมากที่สุด</h3><p>เรียงจากยอดรายจ่ายที่บันทึก</p></div></div><div id="insight-category-chart" class="category-chart"></div></section><section class="panel"><div class="panel-heading"><div><div class="panel-label">SMALL LEAKS, BIG TOTAL</div><h3>โอกาสประหยัดจากบริการซ้ำ</h3><p>บริการที่ระบุว่าใช้น้อยหรือไม่ได้ใช้</p></div></div><div class="savings-feature"><div class="savings-big" id="insight-savings-year">฿0</div><span>ประมาณการต่อปี หากเลือกยกเลิกบริการกลุ่มนี้ทั้งหมด</span><div class="savings-progress"><div id="savings-progress-fill"></div></div><div class="savings-progress-label"><span>ต่อเดือน</span><strong id="insight-savings-month">฿0</strong></div></div><div id="insight-review-list" class="review-list"></div></section></div>
+        <section class="panel projection-panel"><div class="panel-heading"><div><div class="panel-label">SPENDING PACE</div><h3>ถ้าใช้เงินในจังหวะเดิม สิ้นเดือนจะเป็นเท่าไร?</h3><p>เป็นการประมาณจากรายจ่ายที่บันทึกแล้ว ไม่ใช่การรับประกัน</p></div><span class="projection-icon">⌁</span></div><div class="projection-content"><div><span class="projection-label">ใช้ไปแล้ว</span><strong id="projection-spent">฿0</strong></div><div class="projection-arrow">→</div><div><span class="projection-label">ประมาณการสิ้นเดือน</span><strong id="projection-total">฿0</strong></div><div class="projection-budget"><div class="projection-budget-top"><span>งบประมาณเดือนนี้</span><button id="edit-budget-inline" class="mini-link">ปรับงบ ↗</button></div><div class="budget-track"><span id="projection-budget-fill"></span></div><small id="projection-budget-caption">ยังไม่ได้ตั้งงบ</small></div></div></section>
+        <div class="insight-note"><span>ⓘ</span><p>อินไซต์ทั้งหมดคำนวณจากข้อมูลที่คุณบันทึกใน LifeRadar เท่านั้น ระบบไม่สามารถเห็นธุรกรรมธนาคารหรือรู้ว่าคุณใช้บริการจริงหรือไม่ จนกว่าคุณจะบันทึกข้อมูลเอง</p></div>
+      </section>
+
+      <section class="view-panel" id="view-settings" data-panel="settings" hidden>
+        <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR SPACE, YOUR RULES</div><h1>ตั้งค่าพื้นที่ของฉัน <span class="heading-emoji">⚙</span></h1><p class="subheading">ปรับ LifeRadar ให้เหมาะกับชีวิตของคุณ พร้อมควบคุมข้อมูลได้เอง</p></div></div>
+        <div class="settings-grid"><section class="panel settings-card"><div class="settings-icon mint-icon">฿</div><h3>งบประมาณรายเดือน</h3><p>ใช้เป็นเส้นอ้างอิงในการดูจังหวะการใช้เงิน ไม่ใช่ข้อบังคับว่าต้องใช้ได้เท่านี้เท่านั้น</p><label for="monthly-budget">งบที่ตั้งไว้ (บาท)</label><div class="input-with-suffix"><input id="monthly-budget" type="number" min="0" step="500" value="15000"><span>THB / เดือน</span></div><button class="button button-primary full-button" id="save-budget">บันทึกงบประมาณ</button><div id="budget-save-message" class="inline-message" aria-live="polite"></div></section>
+        <section class="panel settings-card"><div class="settings-icon lilac-icon">↧</div><h3>สำรองและย้ายข้อมูล</h3><p>ข้อมูลเก็บอยู่ในเบราว์เซอร์นี้ คุณสามารถส่งออกเป็นไฟล์ JSON เพื่อสำรองหรือย้ายเครื่องได้</p><button class="button button-outline full-button" id="export-data">ดาวน์โหลดไฟล์สำรอง (.json) <span>↗</span></button><label class="file-label" for="import-file">นำเข้าข้อมูลสำรอง</label><input id="import-file" type="file" accept="application/json,.json"><div class="inline-message" id="import-message" aria-live="polite"></div></section>
+        <section class="panel settings-card privacy-settings"><div class="settings-icon blue-icon">⌑</div><h3>ข้อมูลและความเป็นส่วนตัว</h3><p>ไม่มีบัญชีผู้ใช้และไม่มีการซิงก์ข้ามอุปกรณ์ ข้อมูลที่บันทึกไว้จะอยู่ใน local storage ของเบราว์เซอร์นี้</p><div class="privacy-check"><span>✓</span> ไม่ต้องใส่รหัสผ่านหรือข้อมูลธนาคาร</div><div class="privacy-check"><span>✓</span> ลบหรือส่งออกข้อมูลได้เอง</div><div class="privacy-check"><span>✓</span> ไม่มีการเชื่อมบัญชีธนาคารอัตโนมัติ</div></section><section class="panel settings-card danger-settings"><div class="settings-icon coral-icon">⌫</div><h3>เริ่มใหม่หรือล้างข้อมูล</h3><p>การล้างข้อมูลจะลบรายการที่บันทึกไว้ในเบราว์เซอร์ปัจจุบัน ควรดาวน์โหลดไฟล์สำรองก่อน</p><button class="button button-danger full-button" id="clear-all-data">ล้างข้อมูลทั้งหมด</button></section></div>
+        <div class="settings-disclaimer"><strong>หมายเหตุสำคัญ</strong><p>LifeRadar เป็นเครื่องมือจัดการข้อมูลส่วนบุคคล ไม่ใช่แอปธนาคารหรือผู้ให้คำปรึกษาทางการเงิน ตัวเลข ภาระสมัครสมาชิก และการคาดการณ์อ้างอิงจากข้อมูลที่ผู้ใช้กรอกเท่านั้น</p></div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="เมนูมือถือ"><button class="active" data-view="overview"><span>◈</span>วันนี้</button><button data-view="expenses"><span>↗</span>รายจ่าย</button><button data-view="subscriptions"><span>⟳</span>สมาชิก</button><button data-view="insights"><span>✳</span>อินไซต์</button><button data-view="settings"><span>⚙</span>ตั้งค่า</button></nav>
+  <dialog id="entry-dialog" class="entry-dialog"><div class="dialog-shell"><div class="dialog-top"><div><div class="dialog-eyebrow" id="dialog-eyebrow">QUICK ENTRY</div><h2 id="dialog-title">เพิ่มรายการ</h2></div><button type="button" class="dialog-close" id="dialog-close" aria-label="ปิด">×</button></div><p class="dialog-subtitle" id="dialog-subtitle">กรอกเท่าที่รู้ รายละเอียดแก้ไขทีหลังได้</p><form id="entry-form"><div id="dialog-fields" class="dialog-fields"></div><div class="dialog-actions"><button type="button" class="button button-ghost" id="dialog-cancel">ยกเลิก</button><button type="submit" class="button button-primary" id="dialog-submit">บันทึกรายการ</button></div></form></div></dialog>
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>
