@@ -45,7 +45,7 @@
       </header>
 
       <section class="view-panel active" id="view-overview" data-panel="overview">
-        <div class="welcome-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR DAILY RADAR</div><h1 id="greeting-title">สวัสดี วันนี้เรามาจัดการเงินกัน ✨</h1><p class="subheading">เรื่องเงินไม่ต้องเป๊ะทุกวัน แค่เห็นภาพชัดขึ้นวันละนิดก็พอ</p></div><button class="button button-primary" id="quick-expense"><span>＋</span> บันทึกรายการ</button></div>
+        <div class="welcome-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> YOUR DAILY RADAR</div><h1 id="greeting-title">สวัสดี วันนี้เรามาจัดการเงินกัน ✨</h1><p class="subheading">เรื่องเงินไม่ต้องเป๊ะทุกวัน แค่เห็นภาพชัดขึ้นวันละนิดก็พอ</p></div><div class="welcome-actions"><button class="button button-glass-light" id="daily-digest-open"><span>✦</span> สรุปสำคัญวันนี้</button><button class="button button-primary" id="quick-expense"><span>＋</span> บันทึกเร็ว</button></div></div>
         <div class="demo-banner" id="demo-banner"><span class="demo-spark">✦</span><span><strong>คุณกำลังดูข้อมูลตัวอย่าง</strong> — ลองกดเล่นได้ทุกอย่าง หรือเริ่มบันทึกข้อมูลจริงของคุณ</span><button id="start-real-data">เริ่มใช้จริง <span>→</span></button></div>
 
         <section class="hero-card">
@@ -107,6 +107,14 @@
 
   <nav class="mobile-nav" aria-label="เมนูมือถือ"><button class="active" data-view="overview"><span>◈</span>วันนี้</button><button data-view="expenses"><span>↗</span>รายจ่าย</button><button data-view="subscriptions"><span>⟳</span>สมาชิก</button><button data-view="insights"><span>✳</span>อินไซต์</button><button data-view="settings"><span>⚙</span>ตั้งค่า</button></nav>
   <dialog id="entry-dialog" class="entry-dialog"><div class="dialog-shell"><div class="dialog-top"><div><div class="dialog-eyebrow" id="dialog-eyebrow">QUICK ENTRY</div><h2 id="dialog-title">เพิ่มรายการ</h2></div><button type="button" class="dialog-close" id="dialog-close" aria-label="ปิด">×</button></div><p class="dialog-subtitle" id="dialog-subtitle">กรอกเท่าที่รู้ รายละเอียดแก้ไขทีหลังได้</p><form id="entry-form"><div id="dialog-fields" class="dialog-fields"></div><div class="dialog-actions"><button type="button" class="button button-ghost" id="dialog-cancel">ยกเลิก</button><button type="submit" class="button button-primary" id="dialog-submit">บันทึกรายการ</button></div></form></div></dialog>
+  <dialog id="digest-dialog" class="digest-dialog" aria-labelledby="digest-title">
+    <div class="digest-shell">
+      <div class="digest-top"><span class="digest-pill">✦ DAILY RADAR</span><button type="button" class="dialog-close" id="digest-close" aria-label="ปิดสรุป">×</button></div>
+      <div class="digest-progress" id="digest-progress"><i></i><i></i><i></i></div>
+      <div id="digest-slide" class="digest-slide"><div class="digest-art">✦</div><p class="digest-kicker">สรุปสำคัญวันนี้</p><h2 id="digest-title">เงินของคุณกำลังบอกอะไร?</h2><p id="digest-body">สรุปจากข้อมูลที่บันทึกไว้</p><div id="digest-stat" class="digest-stat">฿0</div><p id="digest-foot" class="digest-foot">ข้อมูลจากรายการของคุณ</p></div>
+      <div class="digest-controls"><button class="button button-ghost" id="digest-prev">← ก่อนหน้า</button><div id="digest-dots" class="digest-dots"><i class="active"></i><i></i><i></i></div><button class="button button-primary" id="digest-next">ถัดไป →</button></div>
+    </div>
+  </dialog>
   <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
   <script src="script.js" defer></script>
 </body>

@@ -1,14 +1,10 @@
 {
   "name": "LifeRadar — เงินไม่หาย ชีวิตไม่หล่น",
   "short_name": "LifeRadar",
-  "description": "ผู้ช่วยจัดการรายจ่ายและ Subscription ส่วนตัว",
-  "lang": "th-TH",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "ผู้ช่วยจัดการรายจ่ายและ Subscription",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#f5f6f1",
+  "background_color": "#f5f7f1",
   "theme_color": "#111b2b",
-  "icons": [
-    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
-  ]
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }

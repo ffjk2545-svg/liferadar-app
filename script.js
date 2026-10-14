@@ -190,13 +190,13 @@
     $('#dialog-subtitle').textContent=kind==='subscription'?'ใส่ราคา รอบบิล และบอกความถี่ในการใช้ เพื่อช่วยมองเห็นบริการที่อาจไม่คุ้ม':kind==='budget'?'เลือกงบที่สอดคล้องกับชีวิตจริง แล้วค่อยปรับได้เสมอ':'ใส่ข้อมูลเท่าที่รู้ ยิ่งบันทึกครบยิ่งเห็นภาพจริง';
     let html='';
     if(kind==='expense'||kind==='income') {
-      const isIncome=kind==='income';const defaultCats=isIncome?[{value:'เงินเดือน',label:'💼 เงินเดือน'},{value:'ฟรีแลนซ์',label:'✨ ฟรีแลนซ์'},{value:'อื่นๆ',label:'✳️ อื่นๆ'}]:categoryOptions.map(c=>({value:c,label:`${iconForCategory(c)} ${c}`}));
-      html+=field('ชื่อรายการ','title',item?.title||'', 'text',{full:true,placeholder:isIncome?'เช่น เงินเดือน / รายได้เสริม':'เช่น กาแฟ ค่าเดินทาง ซื้อของ',});
-      html+=field('จำนวนเงิน (บาท)','amount',item?.amount??'','number');
-      html+=field('วันที่','date',item?.date||todayISO(),'date');
-      html+=field('หมวดหมู่','category',item?.category||(isIncome?'เงินเดือน':'อาหาร'),'select',{options:defaultCats});
-      html+=field('รายละเอียดเพิ่มเติม (ไม่บังคับ)','note',item?.note||'','text',{full:true,required:false,placeholder:'จดไว้สั้น ๆ ว่าจ่ายเพื่ออะไร'});
-      if(!isIncome)html+=`<div class="form-field full-field"><label>ประเภท</label><div class="kind-switch"><button type="button" data-kind-switch="expense" class="${kind==='expense'?'selected':''}">↘ รายจ่าย</button><button type="button" data-kind-switch="income">↗ รายรับ</button></div></div>`;
+      const isIncome=kind==='income';
+      const currentCategory=item?.category||(isIncome?'เงินเดือน':'อื่นๆ');
+      const quickCats=isIncome?[['เงินเดือน','💼'],['ฟรีแลนซ์','✨'],['อื่นๆ','➕']]:[['อาหาร','🍜'],['กาแฟ/ขนม','☕'],['เดินทาง','🚆'],['ช้อปปิ้ง','🛍️'],['บ้าน/บิล','🏡'],['อื่นๆ','➕']];
+      html+=`<div class="quick-kind-switch full-field"><button type="button" data-kind-switch="expense" class="${kind==='expense'?'selected':''}">↘ จ่ายเงิน</button><button type="button" data-kind-switch="income" class="${kind==='income'?'selected':''}">↗ ได้รับเงิน</button></div>`;
+      html+=`<div class="quick-amount-wrap full-field"><label for="f-amount">${isIncome?'ได้เงินเท่าไหร่?':'จ่ายไปเท่าไหร่?'}</label><div class="quick-amount-input"><span>฿</span><input id="f-amount" name="amount" type="number" min="0.01" step="any" inputmode="decimal" placeholder="0" value="${item?.amount??''}" required autofocus></div><small>ใส่แค่ตัวเลขก็พอ รายละเอียดค่อยเติมทีหลังได้</small></div>`;
+      html+=`<div class="quick-category-wrap full-field"><div class="quick-category-title">${isIncome?'เงินมาจากไหน?':'กดเลือกถ้าอยากแยกหมวด (ไม่เลือกก็ได้)'}</div><div class="quick-category-chips">${quickCats.map(([c,icon])=>`<button type="button" class="quick-cat ${c===currentCategory?'selected':''}" data-quick-category="${c}"><span>${icon}</span>${c}</button>`).join('')}</div><input type="hidden" id="f-category" name="category" value="${currentCategory}"></div>`;
+      html+=`<div class="quick-extra full-field"><label for="f-title">จำว่าเป็นค่าอะไร? <span>ไม่บังคับ</span></label><input id="f-title" name="title" type="text" value="${escapeHTML(item?.title||'')}" placeholder="เช่น ข้าวเที่ยง, BTS, เงินเดือน"><input type="hidden" id="f-date" name="date" value="${item?.date||todayISO()}"><input type="hidden" id="f-note" name="note" value="${escapeHTML(item?.note||'')}"></div>`;
     } else if(kind==='subscription') {
       html+=field('ชื่อบริการ','name',item?.name||'','text',{full:true,placeholder:'เช่น Netflix, Spotify, Cloud Storage'});
       html+=field('ราคาในแต่ละรอบ (บาท)','amount',item?.amount??'','number');
@@ -226,7 +226,7 @@
     }
     let kind=dialogKind; if(data.kind)kind=data.kind;
     const entry={title:(data.title||'').trim(),amount:Number(data.amount),date:data.date,category:data.category,kind:kind==='income'?'income':'expense',note:(data.note||'').trim()};
-    if(!entry.title||!(entry.amount>0)||!entry.date){toast('กรอกชื่อ จำนวนเงิน และวันที่ให้ครบก่อนนะ','error');return;}
+    if(!(entry.amount>0)||!entry.date){toast('ใส่จำนวนเงินก่อนนะครับ','error');return;} if(!entry.title) entry.title=entry.kind==='income'?'รายรับ':'รายจ่าย'; if(!entry.category) entry.category=entry.kind==='income'?'อื่นๆ':'อื่นๆ';
     if(state.isDemo && !editing) { if(!confirm('ตอนนี้เป็นข้อมูลตัวอย่าง หากบันทึกรายการจริง ระบบจะลบข้อมูลตัวอย่างออกก่อน ต้องการดำเนินการต่อไหม?')) return; state=emptyState(); }
     if(editing){const index=state.transactions.findIndex(t=>t.id===editing);if(index>=0)state.transactions[index]={...state.transactions[index],...entry};toast('แก้ไขรายการแล้ว');}
     else {state.transactions.unshift({...entry,id:uid()});toast(entry.kind==='income'?'บันทึกรายรับแล้ว':'บันทึกรายจ่ายแล้ว');}
@@ -239,6 +239,25 @@
   function importData(file) {
     const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!data||!Array.isArray(data.transactions)||!Array.isArray(data.subscriptions))throw new Error('รูปแบบไฟล์ไม่ถูกต้อง');if(!confirm('นำเข้าข้อมูลนี้และแทนที่ข้อมูลที่อยู่ในเบราว์เซอร์ปัจจุบันหรือไม่? แนะนำให้ดาวน์โหลดไฟล์สำรองก่อน'))return;state={version:1,isDemo:false,budget:Number(data.budget)||15000,transactions:data.transactions,subscriptions:data.subscriptions,checkins:Array.isArray(data.checkins)?data.checkins:[],streak:Number(data.streak)||0,lastCheckin:data.lastCheckin||null};save();renderAll();$('#import-message').textContent='นำเข้าข้อมูลสำเร็จ';toast('นำเข้าข้อมูลแล้ว');}catch(err){$('#import-message').textContent='ไฟล์นี้ไม่ใช่ข้อมูลสำรอง LifeRadar ที่ถูกต้อง';toast('นำเข้าไม่ได้: รูปแบบไฟล์ไม่ถูกต้อง','error');}};reader.readAsText(file);
   }
+  let digestIndex=0, digestTimer=null;
+  function digestSlides(){
+    const exp=currentExpenses(), income=currentIncome(), subs=monthlySubsCost(), review=reviewMonthlyCost(), upcoming=activeSubs().filter(s=>daysUntil(s.dueDate)>=0&&daysUntil(s.dueDate)<=7).reduce((n,s)=>n+monthlyCost(s),0);
+    const budget=Number(state.budget)||0, projected=new Date().getDate()?exp/new Date().getDate()*new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate():0;
+    return [
+      {kicker:'ภาพรวมเงินเดือนนี้',title:exp?'เงินออกไปแล้วเท่าไหร่?':'เริ่มเห็นเงินของตัวเอง',body:exp?`รายจ่ายที่คุณบันทึกอยู่ที่ ${currency(exp)}${budget?` จากงบ ${currency(budget)}`:''}`:'บันทึกรายจ่ายแค่ยอดเงินก็เริ่มเห็นภาพรวมได้ ไม่จำเป็นต้องกรอกทุกช่อง',stat:currency(exp),foot:budget?(exp>budget?'รายจ่ายเกินงบที่ตั้งไว้แล้ว ลองดูรายการล่าสุด':'ตัวเลขคำนวณจากรายการที่บันทึก ไม่รวมธุรกรรมที่ยังไม่ได้เพิ่ม'):'ตั้งงบรายเดือนเพื่อเทียบจังหวะการใช้เงิน'},
+      {kicker:'เงินที่จ่ายซ้ำ',title:review?`มี ${currency(review)} ต่อเดือนที่ควรทบทวน`:'เช็กสมาชิกที่จ่ายซ้ำ',body:review?`บริการที่คุณระบุว่าใช้น้อยอาจรวมเป็น ${currency(review*12)} ต่อปี ถ้าไม่คุ้ม ค่อยพิจารณาจัดการทีละบริการ`:'เพิ่มบริการที่จ่ายประจำ แล้วระบุว่าใช้น้อยหรือไม่ได้ใช้ เพื่อคำนวณโอกาสประหยัด',stat:currency(review*12),foot:'ประมาณการต่อปีจากบริการที่คุณทำเครื่องหมายว่าใช้น้อย'},
+      {kicker:'สิ่งที่กำลังจะมาถึง',title:upcoming?`เตรียมรับยอดตัดเงิน ${currency(upcoming)}`:'มีอะไรจะตัดเงินเร็ว ๆ นี้ไหม?',body:upcoming?'ตรวจวันตัดเงินใน 7 วันข้างหน้า เพื่อให้ยอดที่เกิดซ้ำไม่ทำให้แผนเดือนนี้สะดุด':'บันทึกวันตัดเงินของบริการที่มี แล้ว LifeRadar จะรวมยอดใกล้ถึงกำหนดให้',stat:currency(upcoming),foot:`รายรับที่บันทึกเดือนนี้ ${currency(income)} · ประมาณการรายจ่ายสิ้นเดือน ${currency(projected)}`}
+    ];
+  }
+  function showDigestSlide(index){
+    const slides=digestSlides();digestIndex=(index+slides.length)%slides.length;const s=slides[digestIndex];
+    $('#digest-slide').classList.remove('digest-slide-in');void $('#digest-slide').offsetWidth;$('#digest-slide').classList.add('digest-slide-in');
+    $('#digest-title').textContent=s.title;$('#digest-body').textContent=s.body;$('#digest-stat').textContent=s.stat;$('#digest-foot').textContent=s.foot;$('.digest-kicker').textContent=s.kicker;
+    $$('#digest-progress i').forEach((el,i)=>el.classList.toggle('active',i===digestIndex));$$('#digest-dots i').forEach((el,i)=>el.classList.toggle('active',i===digestIndex));
+    $('#digest-prev').disabled=digestIndex===0;$('#digest-next').textContent=digestIndex===slides.length-1?'ดูอีกครั้ง ↻':'ถัดไป →';
+  }
+  function openDigest(auto=false){showDigestSlide(0);if(!$('#digest-dialog').open)$('#digest-dialog').showModal();if(digestTimer)clearInterval(digestTimer);digestTimer=setInterval(()=>{if(!$('#digest-dialog').open){clearInterval(digestTimer);digestTimer=null;return;}showDigestSlide(digestIndex+1);},6500);if(auto)localStorage.setItem('liferadar.digest-day',todayISO());}
+  function closeDigest(){if($('#digest-dialog').open)$('#digest-dialog').close();if(digestTimer)clearInterval(digestTimer);digestTimer=null;localStorage.setItem('liferadar.digest-day',todayISO());}
   function bindEvents() {
     $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
     $$('[data-goto]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.goto)));
@@ -251,13 +270,17 @@
     $('#transaction-list').addEventListener('click',e=>{const edit=e.target.closest('[data-edit-tx]'),del=e.target.closest('[data-delete-tx]');if(edit){const tx=state.transactions.find(t=>t.id===edit.dataset.editTx);if(tx)openDialog(tx.kind,tx.id);}if(del){const tx=state.transactions.find(t=>t.id===del.dataset.deleteTx);if(tx&&confirm(`ลบรายการ “${tx.title}” ใช่ไหม?`)){state.transactions=state.transactions.filter(t=>t.id!==tx.id);save();renderAll();toast('ลบรายการแล้ว');}}});
     $('#subscription-grid').addEventListener('click',e=>{const edit=e.target.closest('[data-edit-sub]'),del=e.target.closest('[data-delete-sub]'),toggle=e.target.closest('[data-toggle-sub]');if(edit)openDialog('subscription',edit.dataset.editSub);if(del){const s=state.subscriptions.find(x=>x.id===del.dataset.deleteSub);if(s&&confirm(`ลบ ${s.name} ออกจากรายการใช่ไหม?`)){state.subscriptions=state.subscriptions.filter(x=>x.id!==s.id);save();renderAll();toast('ลบบริการแล้ว');}}if(toggle){const s=state.subscriptions.find(x=>x.id===toggle.dataset.toggleSub);if(s){s.active=s.active===false;save();renderAll();toast(s.active?'กลับมาติดตามบริการนี้แล้ว':'พักการติดตามบริการแล้ว');}}});
     $('#dialog-close').addEventListener('click',closeDialog);$('#dialog-cancel').addEventListener('click',closeDialog);$('#entry-form').addEventListener('submit',handleEntrySubmit);
-    $('#dialog-fields').addEventListener('click',e=>{const b=e.target.closest('[data-kind-switch]');if(!b)return;const kind=b.dataset.kindSwitch;dialogKind=kind;const nameField=$('#f-title'),cat=$('#f-category');const currentTitle=nameField?.value||'';const currentAmount=$('#f-amount')?.value||'';const currentDate=$('#f-date')?.value||todayISO();const currentNote=$('#f-note')?.value||'';openDialog(kind,editing);if($('#f-title'))$('#f-title').value=currentTitle;if($('#f-amount'))$('#f-amount').value=currentAmount;if($('#f-date'))$('#f-date').value=currentDate;if($('#f-note'))$('#f-note').value=currentNote;});
+    $('#dialog-fields').addEventListener('click',e=>{const cat=e.target.closest('[data-quick-category]');if(cat){const value=cat.dataset.quickCategory;$('#f-category').value=value;$$('[data-quick-category]').forEach(b=>b.classList.toggle('selected',b===cat));const title=$('#f-title');if(title&&!title.value.trim()&&value!=='อื่นๆ')title.placeholder=`เช่น ${value}`;}});
+    $('#daily-digest-open').addEventListener('click',()=>openDigest(false));
+    $('#digest-close').addEventListener('click',closeDigest);$('#digest-prev').addEventListener('click',()=>showDigestSlide(digestIndex-1));$('#digest-next').addEventListener('click',()=>showDigestSlide(digestIndex+1));
+    $('#digest-dialog').addEventListener('click',e=>{if(e.target===$('#digest-dialog'))closeDigest();});
+    $('#dialog-fields').addEventListener('click',e=>{const b=e.target.closest('[data-kind-switch]');if(!b)return;const kind=b.dataset.kindSwitch;dialogKind=kind;const nameField=$('#f-title');const currentTitle=nameField?.value||'';const currentAmount=$('#f-amount')?.value||'';const currentDate=$('#f-date')?.value||todayISO();const currentNote=$('#f-note')?.value||'';openDialog(kind,editing);if($('#f-title'))$('#f-title').value=currentTitle;if($('#f-amount'))$('#f-amount').value=currentAmount;if($('#f-date'))$('#f-date').value=currentDate;if($('#f-note'))$('#f-note').value=currentNote;const category=$('#f-category');if(category)category.value=kind==='income'?'เงินเดือน':'อื่นๆ';$$('[data-quick-category]').forEach(b=>b.classList.toggle('selected',b.dataset.quickCategory===category?.value));});
     $('#save-budget').addEventListener('click',()=>{state.budget=Math.max(0,Number($('#monthly-budget').value)||0);save();renderAll();$('#budget-save-message').textContent='บันทึกงบประมาณแล้ว';toast('บันทึกงบประมาณแล้ว');});$('#edit-budget-inline').addEventListener('click',()=>openDialog('budget'));
     $('#export-data').addEventListener('click',exportData);$('#export-quick').addEventListener('click',exportData);$('#import-file').addEventListener('change',e=>{const file=e.target.files?.[0];if(file)importData(file);e.target.value='';});
     $('#clear-all-data').addEventListener('click',()=>{if(!confirm('ลบข้อมูลทั้งหมดจาก LifeRadar ในเบราว์เซอร์นี้จริงหรือไม่? การกระทำนี้ย้อนกลับไม่ได้ หากยังไม่ได้สำรองจะกู้คืนไม่ได้'))return;state=emptyState();save();renderAll();toast('ล้างข้อมูลแล้ว เริ่มใหม่ได้เลย');});
     $('#entry-dialog').addEventListener('click',e=>{if(e.target===$('#entry-dialog'))closeDialog();});
     window.addEventListener('hashchange',()=>{const name=location.hash.replace('#','');if(viewNames[name])switchView(name);});
   }
-  function init() { if(!localStorage.getItem(STORAGE_KEY)){save();} bindEvents();renderAll();const hash=location.hash.replace('#','');if(viewNames[hash])switchView(hash);if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+  function init() { if(!localStorage.getItem(STORAGE_KEY)){save();} bindEvents();renderAll();const hash=location.hash.replace('#','');if(viewNames[hash])switchView(hash);if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{}); if(localStorage.getItem('liferadar.digest-day')!==todayISO()) setTimeout(()=>{if(!$('#entry-dialog').open)openDigest(true);},1800); }
   init();
 })();

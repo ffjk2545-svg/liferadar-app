@@ -1,35 +1,27 @@
-LIFERADAR — INSTALLATION GUIDE (THAI)
+LifeRadar v1.1 — Quick Entry + Daily Radar
+=========================================
 
-This is a static website. No Node server, database, or API key is required.
+สิ่งที่ปรับปรุง
+- หน้าตาเพิ่มสีสัน พื้นหลังไล่เฉด การ์ดเด่นขึ้น และตัวหนังสือใหญ่ขึ้น
+- ปุ่ม “บันทึกเร็ว” เปิด Pop-up แบบเร็ว เลือกได้แค่ รับเงิน/จ่ายเงิน ใส่จำนวนเงิน แล้วบันทึกได้เลย
+- การเลือกหมวดเป็นตัวเลือกเสริมแบบชิป กดได้ในครั้งเดียว หรือไม่เลือกก็ได้
+- ชื่อรายการเป็นช่องไม่บังคับ ถ้าเว้นว่างระบบใช้ชื่อ “รายจ่าย” หรือ “รายรับ” ให้
+- มี Pop-up “สรุปสำคัญวันนี้” 3 สไลด์ พร้อมตัวเลขจากข้อมูลที่บันทึกและเลื่อนอัตโนมัติ
+- Pop-up สรุปประจำวันแสดงอัตโนมัติวันละครั้ง และเปิดดูเองได้จากปุ่มหน้าแรก
+- ข้อมูลส่วนบุคคลเก็บใน localStorage ของเบราว์เซอร์
+- เพิ่ม icon, manifest และ service worker ให้ครบตามที่ HTML อ้างถึง
 
-FILES
-- index.html          app structure
-- style.css           responsive visual style
-- script.js           app behavior and local calculations
-- manifest.webmanifest and sw.js  optional installable/offline shell support
-- icon.svg            app icon
+วิธีทดลองในเครื่อง
+1. แตกไฟล์ ZIP
+2. เปิด index.html ในเบราว์เซอร์เพื่อทดลองฟังก์ชันหลัก
+3. หากต้องการทดสอบการติดตั้ง PWA / service worker ให้เปิดผ่าน localhost หรือ deploy เป็น HTTPS
 
-EASIEST DEPLOYMENT USING GITHUB + VERCEL
-1. Create a NEW GitHub repository called liferadar-app. Do not replace the existing stocklens-app repository.
-2. Upload the CONTENTS of this folder to the root of the new repository (not a nested LifeRadar-v1 folder).
-3. In Vercel, Add New -> Project, import the liferadar-app GitHub repository.
-4. Framework Preset: Other. Build command: leave empty. Output directory: leave empty or use the project root, per Vercel's screen. No environment variables are needed.
-5. Deploy. On future updates, upload/commit changed files in GitHub and Vercel will redeploy automatically.
+วิธี Deploy ผ่าน GitHub + Vercel
+1. อัปโหลดไฟล์ทั้งหมดในโฟลเดอร์นี้ไปที่ root ของ repository
+2. Commit changes แล้วรอ Vercel deploy
+3. ไม่ต้องใช้ API key หรือ backend สำหรับเวอร์ชันนี้
 
-FIRST VISIT
-The site starts with sample data so the dashboard is not empty. A banner identifies the data as sample data. Use "เริ่มใช้จริง" to clear the sample records and start with your own data. All buttons and forms are interactive.
-
-FEATURES
-- Log expenses and income; edit and delete entries.
-- Record recurring subscriptions with amount, billing cycle, next charge date, and frequency of use.
-- Calculate monthly equivalent and yearly cost for subscriptions.
-- Estimate potential savings from items marked rarely used or unused. This is an estimate, not a recommendation to cancel automatically.
-- Upcoming renewal list, spending category breakdown, budget pace estimate, daily check-in streak, JSON export/import, budget setting.
-- Responsive desktop and mobile UI; installable PWA shell on supported HTTPS hosting.
-
-PRIVACY & LIMITATIONS
-- This version stores data in localStorage on the current browser/device. It does not sync across devices and does not connect to a bank.
-- Export a JSON backup from Settings before clearing browser storage or moving devices.
-- The monthly spending pace is a straight-line estimate based on logged transactions so far; it is not a forecast of actual future spending.
-- Subscriptions marked rarely/never generate an opportunity estimate. Review terms, cancellation policies, and data access before cancelling anything.
-- Since this static build does not use an AI API, it does not send private records to a third party.
+หมายเหตุ
+- ถ้าต้องการให้ข้อมูลซิงก์ข้ามอุปกรณ์ ต้องเพิ่มระบบบัญชีผู้ใช้และฐานข้อมูลในอนาคต
+- ยอดและอินไซต์คำนวณจากข้อมูลที่ผู้ใช้กรอกเอง ไม่ได้เชื่อมบัญชีธนาคาร
+- ข้อมูลตัวอย่างเป็นข้อมูลจำลอง ให้กด “เริ่มใช้จริง” ก่อนบันทึกข้อมูลของตัวเอง
