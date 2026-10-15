@@ -1,27 +1,40 @@
-LifeRadar v1.1 — Quick Entry + Daily Radar
-=========================================
+LIFERADAR — PERSONAL FINANCE DASHBOARD
+LifeRadar 2.0 — redesigned from the v1.1 project
 
-สิ่งที่ปรับปรุง
-- หน้าตาเพิ่มสีสัน พื้นหลังไล่เฉด การ์ดเด่นขึ้น และตัวหนังสือใหญ่ขึ้น
-- ปุ่ม “บันทึกเร็ว” เปิด Pop-up แบบเร็ว เลือกได้แค่ รับเงิน/จ่ายเงิน ใส่จำนวนเงิน แล้วบันทึกได้เลย
-- การเลือกหมวดเป็นตัวเลือกเสริมแบบชิป กดได้ในครั้งเดียว หรือไม่เลือกก็ได้
-- ชื่อรายการเป็นช่องไม่บังคับ ถ้าเว้นว่างระบบใช้ชื่อ “รายจ่าย” หรือ “รายรับ” ให้
-- มี Pop-up “สรุปสำคัญวันนี้” 3 สไลด์ พร้อมตัวเลขจากข้อมูลที่บันทึกและเลื่อนอัตโนมัติ
-- Pop-up สรุปประจำวันแสดงอัตโนมัติวันละครั้ง และเปิดดูเองได้จากปุ่มหน้าแรก
-- ข้อมูลส่วนบุคคลเก็บใน localStorage ของเบราว์เซอร์
-- เพิ่ม icon, manifest และ service worker ให้ครบตามที่ HTML อ้างถึง
+OVERVIEW
+LifeRadar is a clean, responsive personal-finance dashboard for tracking cash flow, transactions, recurring payments, category budgets and saving goals. The interface uses a consistent icon system rather than context-free emoji. It is designed to feel calm, legible and practical on desktop and mobile.
 
-วิธีทดลองในเครื่อง
-1. แตกไฟล์ ZIP
-2. เปิด index.html ในเบราว์เซอร์เพื่อทดลองฟังก์ชันหลัก
-3. หากต้องการทดสอบการติดตั้ง PWA / service worker ให้เปิดผ่าน localhost หรือ deploy เป็น HTTPS
+FILES
+- index.html              App structure and forms
+- style.css               Responsive design system
+- script.js               Transactions, recurring items, budgets, goals, charts and local storage
+- icon.svg                App icon
+- manifest.webmanifest    Optional installable web app manifest
+- sw.js                   Optional app-shell cache for HTTPS hosting
 
-วิธี Deploy ผ่าน GitHub + Vercel
-1. อัปโหลดไฟล์ทั้งหมดในโฟลเดอร์นี้ไปที่ root ของ repository
-2. Commit changes แล้วรอ Vercel deploy
-3. ไม่ต้องใช้ API key หรือ backend สำหรับเวอร์ชันนี้
+RUN LOCALLY
+Open index.html in a modern browser for a quick preview. For reliable localStorage behavior and the installable app shell, use VS Code Live Server or deploy on HTTPS (for example, Vercel). Google Fonts require an internet connection; the interface falls back to system fonts when offline. All app features use browser localStorage and require no API key or database.
 
-หมายเหตุ
-- ถ้าต้องการให้ข้อมูลซิงก์ข้ามอุปกรณ์ ต้องเพิ่มระบบบัญชีผู้ใช้และฐานข้อมูลในอนาคต
-- ยอดและอินไซต์คำนวณจากข้อมูลที่ผู้ใช้กรอกเอง ไม่ได้เชื่อมบัญชีธนาคาร
-- ข้อมูลตัวอย่างเป็นข้อมูลจำลอง ให้กด “เริ่มใช้จริง” ก่อนบันทึกข้อมูลของตัวเอง
+DEPLOY WITH GITHUB + VERCEL
+1. Upload the CONTENTS of this folder to the repository root (do not upload the parent folder as a nested folder).
+2. Import the repository into Vercel with Framework Preset set to Other.
+3. No build command or environment variables are required for the static site.
+4. After deploying, use Settings > Download backup to save a JSON backup before clearing browser storage or moving devices.
+
+FEATURES
+- Add, edit, search, filter and delete income and expense records.
+- Quick entry requires only an amount; title, category and notes can be left blank.
+- Monthly cash flow, 6-month trend and category breakdown.
+- Recurring payments with billing cycles, next charge dates, usage notes and a review estimate for rarely/never-used services.
+- Monthly budget plus category-specific budget limits.
+- Saving goals with progress tracking and contributions.
+- Daily brief, upcoming-payment overview, spending-pace estimate and insights from recorded data.
+- JSON backup and restore, clear-all control, responsive navigation and mobile-friendly forms.
+
+DATA AND PRIVACY
+All information is stored in localStorage in the current browser/device. This build does not connect to a bank account, send transaction records to a server, or sync data across devices. Browser storage can be cleared by the browser or device; back up important records regularly. The initial view contains sample data to demonstrate charts and features. Use “เริ่มใช้จริง” to clear the sample dataset. The redesign keeps the existing `liferadar.v1` localStorage key and normalizes the older transaction/subscription structure, so existing records in the same browser should remain available. Download a JSON backup before updating as a precaution.
+
+NOTES
+- Financial totals and estimates use the records you enter and may be incomplete if entries are missing.
+- Potential subscription savings are estimates based on the usage level you selected, not an instruction to cancel a service.
+- The spending-pace figure is a straight-line estimate from month-to-date spending, not a guaranteed forecast.
