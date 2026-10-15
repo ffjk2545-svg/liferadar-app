@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#11251e">
+  <meta name="color-scheme" content="light">
   <meta name="description" content="LifeRadar — แดชบอร์ดจัดการเงินส่วนตัว งบประมาณ รายจ่ายประจำ และเป้าหมายการออม">
   <title>LifeRadar — Personal Finance, Clearly.</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -47,6 +48,30 @@
         <section class="view-panel active" id="view-overview" data-panel="overview">
           <div class="page-intro intro-overview"><div><div class="eyebrow">FINANCIAL OVERVIEW <span class="eyebrow-rule"></span><span id="overview-month">ตุลาคม 2569</span></div><h1>ภาพรวมการเงินของคุณ</h1><p class="page-description">เห็นภาพชัดขึ้น ตัดสินใจได้ดีขึ้น ทีละวัน</p></div><div class="intro-actions"><button class="button button-secondary" id="daily-brief"><span data-icon="sparkles"></span> สรุปวันนี้</button><button class="button button-primary" id="overview-add"><span data-icon="plus"></span> บันทึกรายการ</button></div></div>
           <div class="demo-notice" id="demo-banner" hidden><span class="notice-icon" data-icon="info"></span><span><strong>โหมดข้อมูลตัวอย่าง</strong><small>ทดลองใช้ฟีเจอร์ต่าง ๆ ได้ หรือเริ่มต้นด้วยข้อมูลของคุณเอง</small></span><button class="notice-action" id="start-real-data">เริ่มใช้จริง <span data-icon="arrow-right"></span></button></div>
+
+          <section class="quick-capture-card" id="quick-capture-card" aria-labelledby="quick-capture-title">
+            <div class="quick-capture-top">
+              <span class="quick-capture-symbol" data-icon="zap" aria-hidden="true"></span>
+              <div class="quick-capture-copy"><span class="quick-overline">QUICK CAPTURE</span><h2 id="quick-capture-title">บันทึกได้ทันที</h2><p>เลือกประเภท ใส่ยอด แล้วกดบันทึก — รายละเอียดอื่นไม่บังคับ</p></div>
+              <div class="quick-capture-budget" id="quick-budget-hint"><span data-icon="target"></span><span>ตั้งงบเพื่อดูงบคงเหลือ</span></div>
+            </div>
+            <form id="quick-entry-form" class="quick-entry-form" novalidate>
+              <div class="quick-entry-main">
+                <div class="quick-kind-switch" role="group" aria-label="ประเภทรายการด่วน">
+                  <button type="button" class="quick-kind-button active expense-mode" data-quick-kind="expense" aria-pressed="true"><span data-icon="arrow-up-right"></span> รายจ่าย</button>
+                  <button type="button" class="quick-kind-button" data-quick-kind="income" aria-pressed="false"><span data-icon="arrow-down-left"></span> รายรับ</button>
+                </div>
+                <label class="quick-amount-box" for="quick-amount"><span>จำนวนเงิน <small>บาท</small></span><span class="quick-amount-input"><b>฿</b><input id="quick-amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0" autocomplete="off" aria-label="จำนวนเงินสำหรับบันทึกด่วน" required></span></label>
+                <button type="submit" class="button button-primary quick-save-button" id="quick-save-button"><span data-icon="check"></span> บันทึกเลย</button>
+                <div class="quick-presets" aria-label="เพิ่มจำนวนเงินอย่างรวดเร็ว"><span>บวกยอด</span><button type="button" data-quick-add="50">+50</button><button type="button" data-quick-add="100">+100</button><button type="button" data-quick-add="200">+200</button><button type="button" data-quick-add="500">+500</button></div>
+              </div>
+              <div class="quick-entry-details">
+                <label class="quick-title-field" for="quick-title"><span>ชื่อรายการ <small>ไม่บังคับ</small></span><input id="quick-title" type="text" maxlength="100" placeholder="เช่น กาแฟตอนเช้า" autocomplete="off"></label>
+                <div class="quick-category-picker"><div class="quick-category-heading"><span>เลือกหมวดเร็ว ๆ</span><select id="quick-category" class="quick-category-select" aria-label="เลือกหมวดหมู่เพิ่มเติม"><option value="">หมวดเพิ่มเติม</option></select></div><div id="quick-category-chips" class="quick-category-chips"></div></div>
+              </div>
+              <div class="quick-entry-foot"><span><i class="privacy-mini-dot"></i> บันทึกในเบราว์เซอร์นี้เท่านั้น</span><span id="quick-entry-count">บันทึกวันนี้ 0 รายการ</span></div>
+            </form>
+          </section>
 
           <section class="balance-card">
             <div class="balance-card-content"><div class="balance-label"><span class="balance-dot"></span> กระแสเงินสดเดือนนี้</div><div class="balance-value" id="overview-balance">฿0</div><div class="balance-caption" id="balance-caption">รายรับลบรายจ่ายที่บันทึกไว้ในเดือนนี้</div><div class="balance-divider"></div><div class="balance-meta"><div><span>รายรับ</span><strong class="positive-value" id="overview-income">฿0</strong></div><div><span>รายจ่าย</span><strong id="overview-expenses">฿0</strong></div><div><span>งบคงเหลือ</span><strong id="overview-budget-remaining">฿0</strong></div></div></div>

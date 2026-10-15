@@ -1,5 +1,5 @@
 LIFERADAR — PERSONAL FINANCE DASHBOARD
-LifeRadar 2.0 — redesigned from the v1.1 project
+LifeRadar 2.1 — quick capture, arrival nudges and refined interactions
 
 OVERVIEW
 LifeRadar is a clean, responsive personal-finance dashboard for tracking cash flow, transactions, recurring payments, category budgets and saving goals. The interface uses a consistent icon system rather than context-free emoji. It is designed to feel calm, legible and practical on desktop and mobile.
@@ -23,7 +23,10 @@ DEPLOY WITH GITHUB + VERCEL
 
 FEATURES
 - Add, edit, search, filter and delete income and expense records.
-- Quick entry requires only an amount; title, category and notes can be left blank.
+- Quick capture is embedded directly on the home screen: choose income/expense, type an amount, tap a preset amount, and optionally choose a category or title.
+- A calm once-per-day arrival notice surfaces the most useful reminder (near-term recurring bill, budget pace, or underused subscription); it is non-blocking.
+- Success and warning toasts use distinct, restrained accent colors and subtle motion.
+- Keyboard shortcut N focuses the home-screen quick amount field when the Overview page is active.
 - Monthly cash flow, 6-month trend and category breakdown.
 - Recurring payments with billing cycles, next charge dates, usage notes and a review estimate for rarely/never-used services.
 - Monthly budget plus category-specific budget limits.
@@ -32,7 +35,7 @@ FEATURES
 - JSON backup and restore, clear-all control, responsive navigation and mobile-friendly forms.
 
 DATA AND PRIVACY
-All information is stored in localStorage in the current browser/device. This build does not connect to a bank account, send transaction records to a server, or sync data across devices. Browser storage can be cleared by the browser or device; back up important records regularly. The initial view contains sample data to demonstrate charts and features. Use “เริ่มใช้จริง” to clear the sample dataset. The redesign keeps the existing `liferadar.v1` localStorage key and normalizes the older transaction/subscription structure, so existing records in the same browser should remain available. Download a JSON backup before updating as a precaution.
+All information is stored in localStorage in the current browser/device. This build does not connect to a bank account, send transaction records to a server, or sync data across devices. Browser storage can be cleared by the browser or device; back up important records regularly. The initial view contains sample data to demonstrate charts and features. Use “เริ่มใช้จริง” to clear the sample dataset. The redesign keeps the existing `liferadar.v1` localStorage key and normalizes the older transaction/subscription structure, so existing records in the same browser should remain available. If the app is still in its marked demo state, the first quick-entry save clears only the demo dataset before saving the real entry. Download a JSON backup before updating as a precaution.
 
 NOTES
 - Financial totals and estimates use the records you enter and may be incomplete if entries are missing.

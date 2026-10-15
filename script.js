@@ -157,6 +157,54 @@
     window.scrollTo({top:0,behavior:'smooth'});
     if(name==='expenses')renderTransactions();
   }
+  let quickKind='expense';
+  function renderQuickCategories(kind=quickKind, selected='') {
+    const all=kind==='income'?incomeCategories:expenseCategories;
+    const popular=kind==='income'?['เงินเดือน','ฟรีแลนซ์','รายได้อื่น']:['อาหาร','กาแฟ/ขนม','เดินทาง','บ้าน/บิล','ช้อปปิ้ง'];
+    const select=$('#quick-category');
+    select.innerHTML=`<option value="">หมวดเพิ่มเติม</option>`+all.map(cat=>`<option value="${escapeHTML(cat)}">${escapeHTML(cat)}</option>`).join('');
+    select.value=all.includes(selected)?selected:'';
+    $('#quick-category-chips').innerHTML=popular.map(cat=>{const info=categoryInfo[cat]||categoryInfo['อื่นๆ'];return `<button type="button" class="quick-category-chip ${selected===cat?'selected':''}" data-quick-category="${escapeHTML(cat)}" aria-pressed="${selected===cat?'true':'false'}"><span>${icon(info.icon)}</span><span>${escapeHTML(cat)}</span></button>`;}).join('');
+    applyIconsToNewContent($('#quick-category-chips'));
+  }
+  function setQuickKind(kind) {
+    quickKind=kind==='income'?'income':'expense';
+    $$('[data-quick-kind]').forEach(btn=>{const active=btn.dataset.quickKind===quickKind;btn.classList.toggle('active',active);btn.classList.toggle('expense-mode',active&&quickKind==='expense');btn.classList.toggle('income-mode',active&&quickKind==='income');btn.setAttribute('aria-pressed',active?'true':'false');});
+    $('#quick-capture-card').classList.toggle('income-mode',quickKind==='income');
+    $('#quick-title').placeholder=quickKind==='income'?'เช่น เงินเดือน / รับเงินคืน':'เช่น กาแฟตอนเช้า / ค่าเดินทาง';
+    $('#quick-category').value='';
+    renderQuickCategories(quickKind,'');
+  }
+  function handleQuickEntrySubmit(event) {
+    event.preventDefault();
+    const amount=Number($('#quick-amount').value);
+    if(!Number.isFinite(amount)||amount<=0){toast('ใส่จำนวนเงินมากกว่า 0 เพื่อบันทึก','error');$('#quick-amount').focus();return;}
+    // If the user starts entering real data from the demo workspace, clear only the marked sample dataset first.
+    const wasDemo=state.isDemo;
+    if(wasDemo){state=emptyState();}
+    const kind=quickKind,category=$('#quick-category').value||'อื่นๆ';
+    const title=$('#quick-title').value.trim()||(kind==='income'?'รายรับ':'รายจ่าย');
+    state.transactions.push({id:uid(),kind,title,category,amount,date:todayISO(),note:''});
+    state.isDemo=false;save();renderAll();
+    const card=$('#quick-capture-card');card.classList.add('is-saved');setTimeout(()=>card.classList.remove('is-saved'),1200);
+    $('#quick-amount').value='';$('#quick-title').value='';$('#quick-category').value='';renderQuickCategories(quickKind,'');
+    toast(wasDemo?`เริ่มใช้ข้อมูลจริงแล้ว · บันทึก ${currency(amount)} เรียบร้อย`:`${kind==='income'?'บันทึกรายรับ':'บันทึกรายจ่าย'} ${currency(amount)} แล้ว`);
+    $('#quick-amount').focus({preventScroll:true});
+  }
+  function showArrivalNotice() {
+    const key='liferadar.arrival-notice-date';
+    try{if(localStorage.getItem(key)===todayISO())return;}catch{}
+    const totals=totalsFor(),budget=Number(state.budget)||0,pct=budget?totals.expense/budget*100:0;
+    const due=comingSubs(1),review=reviewSubs();let message='พร้อมแล้วสำหรับวันนี้ — กดบันทึกเร็วด้านบนเพื่อเก็บทุกยอดไว้ในที่เดียว',type='info';
+    if(due.length){message=due.length===1?`${due[0].name} จะตัดเงิน${daysUntil(due[0].dueDate)===0?'วันนี้':'พรุ่งนี้'} · ${currency(due[0].amount)} เตรียมยอดไว้ได้เลย`: `${due.length} รายการจะตัดเงินวันนี้หรือพรุ่งนี้ · รวม ${currency(due.reduce((sum,s)=>sum+s.amount,0))}`;type='info';}
+    else if(budget&&pct>=100){message=`รายจ่ายที่บันทึกใช้เกินงบเดือนนี้ ${Math.round(pct)}% แล้ว ลองดูหมวดที่ปรับได้`;type='warning';}
+    else if(budget&&pct>=85){message=`ใช้ไป ${Math.round(pct)}% ของงบเดือนนี้แล้ว · เหลืองบ ${currency(budget-totals.expense)}`;type='warning';}
+    else if(review.length&&reviewMonthlyCost()>0){message=`มี ${review.length} บริการที่คุณระบุว่าใช้น้อย · อาจทบทวนค่าใช้จ่ายได้ปีละ ${currency(reviewMonthlyCost()*12)}`;type='info';}
+    else if(!state.transactions.length){message='เริ่มต้นได้ง่าย ๆ: ใส่จำนวนเงินในช่องบันทึกเร็วด้านบน แค่นั้นก็พอ';type='info';}
+    try{localStorage.setItem(key,todayISO());}catch{}
+    setTimeout(()=>toast(message,type),780);
+  }
+
   function renderHeader() {
     const d=new Date();
     $('#overview-month').textContent=new Intl.DateTimeFormat('th-TH',{month:'long',year:'numeric'}).format(d);
@@ -181,6 +229,9 @@
     const status=$('#budget-status');status.className='status-pill '+(budget===0?'status-warn':pct>=100?'status-over':pct>=80?'status-warn':'status-good');status.textContent=budget===0?'ยังไม่ตั้งงบ':pct>=100?'เกินงบ':pct>=80?'ใกล้เต็มงบ':'ตามแผน';
     const budgetInsight=$('#budget-insight p');
     budgetInsight.textContent=budget===0?'ตั้งงบของคุณเองเพื่อให้ LifeRadar ช่วยเทียบจังหวะการใช้เงิน':pct>=100?'รายจ่ายเกินงบที่ตั้งไว้แล้ว ลองทบทวนรายการในหมวดที่ยืดหยุ่นได้':pct>=80?'ใช้ไปมากกว่า 80% ของงบแล้ว เหลืองบ '+currency(remaining):`เหลืองบ ${currency(remaining)} ลองใช้ตัวเลขนี้เป็นแนวทางวางแผนที่เหลือของเดือน`;
+    const quickHint=$('#quick-budget-hint');quickHint.classList.toggle('warn',budget>0&&pct>=80&&pct<100);quickHint.classList.toggle('over',budget>0&&pct>=100);
+    quickHint.querySelector('span:last-child').textContent=budget?`${pct>=100?'เกินงบ ': 'เหลืองบ '}${currency(Math.abs(remaining))}`:'ตั้งงบเพื่อดูงบคงเหลือ';
+    const todayCount=state.transactions.filter(t=>t.date===todayISO()).length;$('#quick-entry-count').textContent=`บันทึกวันนี้ ${todayCount} รายการ`;
     renderTrendChart($('#trend-chart'));renderCategoryBreakdown($('#category-breakdown'),$('#category-total'),$('#category-total-label'));renderUpcoming();renderRecent();
   }
   function renderTrendChart(container) {
@@ -301,7 +352,12 @@
     const id=$('#goal-id').value||uid(),goal={id,name,target,current,targetDate:$('#goal-date').value||''},index=state.goals.findIndex(g=>g.id===id);if(index>=0)state.goals[index]=goal;else state.goals.push(goal);state.isDemo=false;save();closeDialog($('#goal-dialog'));renderAll();toast(index>=0?'แก้ไขเป้าหมายแล้ว':'เพิ่มเป้าหมายการออมแล้ว');
   }
   function toast(message,type='success') {
-    const region=$('#toast-region');while(region.children.length>=3)region.firstElementChild?.remove();const el=document.createElement('div');el.className=`toast ${type==='error'?'error':''}`;el.innerHTML=`${icon(type==='error'?'info':'check')}<span>${escapeHTML(message)}</span>`;region.appendChild(el);setTimeout(()=>{el.classList.add('toast-exit');setTimeout(()=>el.remove(),230);},3200);
+    const region=$('#toast-region');
+    // Keep the surface calm: a successful action replaces a lingering reminder instead of stacking over it.
+    if(type==='success')region.querySelectorAll('.toast.info,.toast.warning').forEach(item=>item.remove());
+    if(type==='info')region.querySelectorAll('.toast.info').forEach(item=>item.remove());
+    while(region.children.length>=3)region.firstElementChild?.remove();
+    const allowed=['error','info','warning'];const style=allowed.includes(type)?type:'';const glyph=type==='error'?'info':type==='warning'?'calendar-clock':type==='info'?'sparkles':'check';const el=document.createElement('div');el.className=`toast ${style}`;el.setAttribute('role',type==='error'?'alert':'status');el.innerHTML=`${icon(glyph)}<span>${escapeHTML(message)}</span>`;region.appendChild(el);setTimeout(()=>{el.classList.add('toast-exit');setTimeout(()=>el.remove(),230);},type==='info'?4700:3200);
   }
   function exportData() {
     const backup={app:'LifeRadar',version:2,exportedAt:new Date().toISOString(),...state};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`liferadar-backup-${todayISO()}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('ดาวน์โหลดไฟล์สำรองแล้ว');
@@ -324,6 +380,11 @@
     $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
     $$('[data-goto]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.goto)));
     $('#top-add').addEventListener('click',()=>openTransaction());$('#overview-add').addEventListener('click',()=>openTransaction());
+    $('#quick-entry-form').addEventListener('submit',handleQuickEntrySubmit);
+    $$('[data-quick-kind]').forEach(btn=>btn.addEventListener('click',()=>setQuickKind(btn.dataset.quickKind)));
+    $('#quick-category-chips').addEventListener('click',event=>{const btn=event.target.closest('[data-quick-category]');if(!btn)return;$('#quick-category').value=btn.dataset.quickCategory;$$('[data-quick-category]').forEach(chip=>{const active=chip.dataset.quickCategory===btn.dataset.quickCategory;chip.classList.toggle('selected',active);chip.setAttribute('aria-pressed',active?'true':'false');});});
+    $('#quick-category').addEventListener('change',()=>{$$('[data-quick-category]').forEach(chip=>{const active=chip.dataset.quickCategory===$('#quick-category').value;chip.classList.toggle('selected',active);chip.setAttribute('aria-pressed',active?'true':'false');});});
+    $('.quick-presets').addEventListener('click',event=>{const btn=event.target.closest('[data-quick-add]');if(!btn)return;const input=$('#quick-amount'),current=Number(input.value)||0;input.value=String(Math.round((current+Number(btn.dataset.quickAdd))*100)/100);input.focus({preventScroll:true});input.dispatchEvent(new Event('input',{bubbles:true}));});
     document.addEventListener('click',event=>{const tx=event.target.closest('[data-open-transaction]'),sub=event.target.closest('[data-open-subscription]'),goal=event.target.closest('[data-open-goal]');if(tx){event.preventDefault();openTransaction();}else if(sub){event.preventDefault();openSubscription();}else if(goal){event.preventDefault();openGoal();}});
     $('#add-goal').addEventListener('click',()=>openGoal());$('#add-goal-inline').addEventListener('click',()=>openGoal());
     $('#daily-brief').addEventListener('click',renderDailyBrief);$('#brief-to-budget').addEventListener('click',()=>{closeDialog($('#daily-dialog'));switchView('budgets');});
@@ -347,10 +408,10 @@
     $('#clear-all-data').addEventListener('click',()=>{if(!confirm('ลบข้อมูลทั้งหมดจาก LifeRadar ในเบราว์เซอร์นี้หรือไม่? การกระทำนี้ย้อนกลับไม่ได้ กรุณาสำรองไฟล์ก่อน'))return;state=emptyState();save();renderAll();toast('ล้างข้อมูลเรียบร้อยแล้ว');});
     $('#save-category-budgets').setAttribute('type','button');
     window.addEventListener('hashchange',()=>{const name=location.hash.replace('#','');if(name)switchView(name,false);});
-    window.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)||event.altKey)return;const target=event.target;if(target&&['INPUT','TEXTAREA','SELECT'].includes(target.tagName))return;if(event.key.toLowerCase()==='n'){event.preventDefault();openTransaction();}if(event.key==='/'){if($('#view-expenses').classList.contains('active')){event.preventDefault();$('#transaction-search').focus();}}if(event.key==='Escape'){$('#sidebar').classList.remove('mobile-open');document.body.classList.remove('nav-open');}});
+    window.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)||event.altKey)return;const target=event.target;if(target&&['INPUT','TEXTAREA','SELECT'].includes(target.tagName))return;if(event.key.toLowerCase()==='n'){event.preventDefault();if($('#view-overview').classList.contains('active'))$('#quick-amount').focus({preventScroll:true});else openTransaction();}if(event.key==='/'){if($('#view-expenses').classList.contains('active')){event.preventDefault();$('#transaction-search').focus();}}if(event.key==='Escape'){$('#sidebar').classList.remove('mobile-open');document.body.classList.remove('nav-open');}});
   }
   function init() {
-    normalizeDueDates();save();applyIcons();bindEvents();renderAll();const hash=location.hash.replace('#','');if(hash)switchView(hash,false);
+    normalizeDueDates();save();applyIcons();renderQuickCategories('expense','');bindEvents();renderAll();const hash=location.hash.replace('#','');if(hash)switchView(hash,false);showArrivalNotice();
     if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
   init();
