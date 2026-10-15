@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#11251e">
+  <meta name="theme-color" content="#1d3042">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="LifeRadar — แดชบอร์ดจัดการเงินส่วนตัว งบประมาณ รายจ่ายประจำ และเป้าหมายการออม">
+  <meta name="description" content="LifeRadar — แดชบอร์ดการเงินส่วนตัวพร้อมกราฟกระแสเงินสด งบประมาณ รายจ่ายประจำ และเป้าหมายการออม">
   <title>LifeRadar — Personal Finance, Clearly.</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
@@ -84,6 +84,35 @@
             <article class="metric-card"><div class="metric-header"><span class="metric-icon icon-blue" data-icon="calendar-clock"></span><span class="metric-name">รายจ่ายประจำ / เดือน</span><span class="metric-trend neutral">RECURRING</span></div><div class="metric-number" id="metric-recurring">฿0</div><div class="metric-foot"><span class="metric-foot-dot blue-dot"></span><span id="metric-recurring-note">บริการที่ยังใช้งานอยู่</span></div></article>
             <article class="metric-card"><div class="metric-header"><span class="metric-icon icon-purple" data-icon="target"></span><span class="metric-name">โอกาสประหยัด / ปี</span><span class="metric-trend neutral">POTENTIAL</span></div><div class="metric-number" id="metric-savings">฿0</div><div class="metric-foot"><span class="metric-foot-dot purple-dot"></span><span id="metric-savings-note">จากบริการที่ระบุว่าใช้น้อย</span></div></article>
           </div>
+
+          <section class="story-dashboard-row" aria-label="อินไซต์การเงินและสถานะงบประมาณ">
+            <article class="money-story-card">
+              <div class="story-decoration story-decoration-one"></div><div class="story-decoration story-decoration-two"></div>
+              <div class="story-content">
+                <div class="story-eyebrow"><span class="story-live-dot"></span> MONEY INSIGHT <span class="story-eyebrow-sep">/</span> เรื่องเล่าจากข้อมูลของคุณ</div>
+                <h2 id="money-story-headline">เงินของคุณกำลังเล่าเรื่องบางอย่าง</h2>
+                <p id="money-story-summary">ทุกยอดที่บันทึกช่วยให้มองเห็นรูปแบบการใช้เงินได้ชัดขึ้น เริ่มจากรายการง่าย ๆ แล้วกลับมาดูภาพรวมที่นี่</p>
+                <div class="story-stat-grid">
+                  <div class="story-stat-tile"><span class="story-stat-icon story-stat-violet" data-icon="chart-no-axes-combined"></span><div><small>หมวดที่ใช้จ่ายสูงสุด</small><strong id="story-top-category">ยังไม่มีข้อมูล</strong><span id="story-top-category-value">บันทึกค่าใช้จ่ายเพื่อเริ่มดูแนวโน้ม</span></div></div>
+                  <div class="story-stat-tile"><span class="story-stat-icon story-stat-coral" data-icon="calendar-range"></span><div><small id="story-pace-label">ประมาณการรายจ่ายสิ้นเดือน</small><strong id="story-pace-value">฿0</strong><span id="story-pace-note">คำนวณจากยอดที่บันทึก</span></div></div>
+                </div>
+              </div>
+              <div class="story-art" aria-hidden="true"><div class="story-art-orbit orbit-a"></div><div class="story-art-orbit orbit-b"></div><div class="story-art-orbit orbit-c"></div><div class="story-art-core"><span data-icon="sparkles"></span></div><span class="story-art-spark spark-a"></span><span class="story-art-spark spark-b"></span></div>
+            </article>
+            <article class="budget-radar-card">
+              <div class="radar-card-top"><span class="radar-icon" data-icon="gauge"></span><span class="radar-tag">LIVE BUDGET</span></div>
+              <h2>จังหวะงบเดือนนี้</h2><p>ดูสัดส่วนการใช้จ่ายเทียบกับงบที่คุณตั้งไว้</p>
+              <div class="budget-gauge-wrap"><div class="budget-gauge" id="budget-gauge-ring" style="--gauge-turn:0deg;--gauge-color:#b8ff70"><div class="budget-gauge-core"><strong id="budget-gauge-percent">0%</strong><span>ใช้ไปแล้ว</span></div></div><div class="gauge-caption"><strong id="budget-gauge-caption">ยังไม่ได้ตั้งงบ</strong><span id="budget-gauge-subcaption">ตั้งงบเพื่อเริ่มติดตาม</span></div></div>
+              <div class="radar-number-row"><div><span>ใช้ไปแล้ว</span><strong id="budget-gauge-spent">฿0</strong></div><div><span>งบคงเหลือ</span><strong id="budget-gauge-left">฿0</strong></div></div>
+              <button class="radar-manage-button" data-goto="budgets">ปรับแผนงบประมาณ <span data-icon="arrow-up-right"></span></button>
+            </article>
+          </section>
+
+          <section class="surface-card daily-spend-panel">
+            <div class="card-heading daily-spend-heading"><div><div class="section-overline">YOUR SPENDING RHYTHM</div><h2>จังหวะการใช้เงินใน 14 วันล่าสุด</h2><p>เห็นวันที่ใช้จ่ายมากเป็นพิเศษ แล้วตัดสินใจจากข้อมูลจริงได้ง่ายขึ้น</p></div><span class="daily-chart-badge"><span data-icon="activity"></span> 14 วันล่าสุด</span></div>
+            <div id="daily-spend-chart" class="daily-spend-chart" role="img" aria-label="กราฟรายจ่ายรายวัน 14 วันล่าสุด"></div>
+            <div class="daily-spend-footer"><p id="daily-spend-insight">เมื่อมีรายการบันทึก กราฟนี้จะช่วยสรุปจังหวะการใช้เงินให้คุณ</p><div class="daily-average-pill"><span data-icon="calculator"></span><div><small>เฉลี่ยต่อวัน</small><strong id="daily-spend-average">฿0</strong></div></div></div>
+          </section>
 
           <div class="dashboard-grid dashboard-first-row">
             <section class="surface-card trend-card"><div class="card-heading"><div><div class="section-overline">CASH FLOW</div><h2>จังหวะเงินเข้า–ออก</h2><p>เปรียบเทียบรายรับและรายจ่ายย้อนหลัง 6 เดือน</p></div><span class="card-badge">6 เดือน</span></div><div class="chart-legend"><span><i class="legend-swatch swatch-income"></i> รายรับ</span><span><i class="legend-swatch swatch-expense"></i> รายจ่าย</span></div><div id="trend-chart" class="trend-chart"></div><div class="chart-axis-caption"><span>ข้อมูลจากธุรกรรมที่บันทึก</span><button class="link-button" data-goto="insights">ดูแนวโน้มทั้งหมด <span data-icon="arrow-up-right"></span></button></div></section>

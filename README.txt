@@ -1,5 +1,5 @@
 LIFERADAR — PERSONAL FINANCE DASHBOARD
-LifeRadar 2.1 — quick capture, arrival nudges and refined interactions
+LifeRadar 2.2 — vibrant finance stories, budget gauge and 14-day spending chart
 
 OVERVIEW
 LifeRadar is a clean, responsive personal-finance dashboard for tracking cash flow, transactions, recurring payments, category budgets and saving goals. The interface uses a consistent icon system rather than context-free emoji. It is designed to feel calm, legible and practical on desktop and mobile.
@@ -27,7 +27,10 @@ FEATURES
 - A calm once-per-day arrival notice surfaces the most useful reminder (near-term recurring bill, budget pace, or underused subscription); it is non-blocking.
 - Success and warning toasts use distinct, restrained accent colors and subtle motion.
 - Keyboard shortcut N focuses the home-screen quick amount field when the Overview page is active.
-- Monthly cash flow, 6-month trend and category breakdown.
+- Monthly cash flow, 6-month trend, category breakdown and a 14-day daily spending chart.
+- Money Story card summarizes monthly cash flow and highlights the leading spending category.
+- Budget radar gauge visualizes how much of the monthly budget has been used, with contextual color and copy.
+- High-contrast gradients, richer category color, micro-interactions and more visual emphasis while preserving simple capture.
 - Recurring payments with billing cycles, next charge dates, usage notes and a review estimate for rarely/never-used services.
 - Monthly budget plus category-specific budget limits.
 - Saving goals with progress tracking and contributions.

@@ -54,6 +54,10 @@
     menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
     list:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
     sparkles:'<path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"/><path d="m19 14 .8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14Z"/>',
+    gauge:'<path d="M3.5 18a9 9 0 1 1 17 0"/><path d="m12 13 4-4"/><circle cx="12" cy="13" r="1.4"/><path d="M6 18h.01M18 18h.01M12 4v1"/>',
+    activity:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+    calculator:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01"/>',
+    'calendar-range':'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 9h18M7 13h4M7 17h10"/>',
   };
   const icon = (name) => `<svg aria-hidden="true" viewBox="0 0 24 24">${iconPaths[name] || iconPaths['circle-ellipsis']}</svg>`;
   const applyIcons = (root = document) => $$('[data-icon]', root).forEach(el => { el.innerHTML = icon(el.dataset.icon); });
@@ -164,7 +168,7 @@
     const select=$('#quick-category');
     select.innerHTML=`<option value="">หมวดเพิ่มเติม</option>`+all.map(cat=>`<option value="${escapeHTML(cat)}">${escapeHTML(cat)}</option>`).join('');
     select.value=all.includes(selected)?selected:'';
-    $('#quick-category-chips').innerHTML=popular.map(cat=>{const info=categoryInfo[cat]||categoryInfo['อื่นๆ'];return `<button type="button" class="quick-category-chip ${selected===cat?'selected':''}" data-quick-category="${escapeHTML(cat)}" aria-pressed="${selected===cat?'true':'false'}"><span>${icon(info.icon)}</span><span>${escapeHTML(cat)}</span></button>`;}).join('');
+    $('#quick-category-chips').innerHTML=popular.map(cat=>{const info=categoryInfo[cat]||categoryInfo['อื่นๆ'];return `<button type="button" class="quick-category-chip ${selected===cat?'selected':''}" data-quick-category="${escapeHTML(cat)}" aria-pressed="${selected===cat?'true':'false'}"><span class="quick-chip-icon" style="background:${info.soft};color:${info.color}">${icon(info.icon)}</span><span>${escapeHTML(cat)}</span></button>`;}).join('');
     applyIconsToNewContent($('#quick-category-chips'));
   }
   function setQuickKind(kind) {
@@ -232,7 +236,70 @@
     const quickHint=$('#quick-budget-hint');quickHint.classList.toggle('warn',budget>0&&pct>=80&&pct<100);quickHint.classList.toggle('over',budget>0&&pct>=100);
     quickHint.querySelector('span:last-child').textContent=budget?`${pct>=100?'เกินงบ ': 'เหลืองบ '}${currency(Math.abs(remaining))}`:'ตั้งงบเพื่อดูงบคงเหลือ';
     const todayCount=state.transactions.filter(t=>t.date===todayISO()).length;$('#quick-entry-count').textContent=`บันทึกวันนี้ ${todayCount} รายการ`;
-    renderTrendChart($('#trend-chart'));renderCategoryBreakdown($('#category-breakdown'),$('#category-total'),$('#category-total-label'));renderUpcoming();renderRecent();
+    renderMoneyStory();renderDailySpendChart();renderTrendChart($('#trend-chart'));renderCategoryBreakdown($('#category-breakdown'),$('#category-total'),$('#category-total-label'));renderUpcoming();renderRecent();
+  }
+  function renderMoneyStory() {
+    const totals=totalsFor(),income=totals.income,expense=totals.expense,net=income-expense,budget=Number(state.budget)||0;
+    const top=transactionTotalsForCategory()[0];
+    const now=new Date(),day=now.getDate(),daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+    const projection=day?expense/day*daysInMonth:0;
+    const pct=budget>0?expense/budget*100:0;
+    const safePct=Math.max(0,Math.min(100,pct));
+    const gaugeColor=budget===0?'#99b5ff':pct>=100?'#ff8d9a':pct>=80?'#ffc76c':'#b8ff70';
+    $('#budget-gauge-ring').style.setProperty('--gauge-turn',`${safePct*3.6}deg`);
+    $('#budget-gauge-ring').style.setProperty('--gauge-color',gaugeColor);
+    $('#budget-gauge-percent').textContent=budget?`${Math.round(pct)}%`:'—';
+    $('#budget-gauge-caption').textContent=!budget?'ยังไม่ได้ตั้งงบ':pct>=100?'เกินงบที่ตั้งไว้':pct>=80?'ใกล้ถึงเพดานงบ':'ยังอยู่ในกรอบงบ';
+    $('#budget-gauge-subcaption').textContent=!budget?'ตั้งงบรายเดือนเพื่อเริ่มติดตาม':pct>=100?'ลองเปิดดูหมวดที่ปรับได้':pct>=80?'เหลืองบไม่มากแล้ว':'คุมจังหวะต่อไปได้เลย';
+    $('#budget-gauge-spent').textContent=currency(expense);
+    $('#budget-gauge-left').textContent=budget?currency(budget-expense):'—';
+    if(!state.transactions.length){
+      $('#money-story-headline').textContent='เริ่มจากรายการเล็ก ๆ แล้วเห็นภาพใหญ่';
+      $('#money-story-summary').textContent='ไม่ต้องกรอกทุกอย่างให้ละเอียดตั้งแต่แรก แค่บันทึกยอดที่จ่ายหรือได้รับ LifeRadar จะค่อย ๆ เปลี่ยนรายการเล็ก ๆ ให้เป็นภาพรวมที่เข้าใจง่าย';
+      $('#story-top-category').textContent='ยังไม่มีข้อมูล';$('#story-top-category-value').textContent='เริ่มจากบันทึกรายจ่ายรายการแรก';
+      $('#story-pace-label').textContent='ประมาณการรายจ่ายสิ้นเดือน';$('#story-pace-value').textContent=currency(0);$('#story-pace-note').textContent='จะคำนวณเมื่อมีรายการจริง';
+      return;
+    }
+    if(income>expense&&income>0){
+      $('#money-story-headline').textContent='กระแสเงินสดเดือนนี้เป็นบวก';
+      $('#money-story-summary').textContent=`จากรายการที่บันทึก รายรับมากกว่ารายจ่ายประมาณ ${currency(net)} ลองแบ่งบางส่วนไปยังเงินสำรองหรือเป้าหมายที่สำคัญ โดยไม่จำเป็นต้องเปลี่ยนทุกอย่างในครั้งเดียว`;
+    }else if(expense>income){
+      $('#money-story-headline').textContent='ลองดูว่าเงินออกไปทางไหนมากที่สุด';
+      $('#money-story-summary').textContent=`รายจ่ายที่บันทึกสูงกว่ารายรับอยู่ ${currency(expense-income)} ตรวจว่ามีรายรับตกหล่นหรือไม่ แล้วค่อยดูหมวดที่ยืดหยุ่นได้ก่อน โดยไม่ต้องตัดสิ่งจำเป็นทันที`;
+    }else{
+      $('#money-story-headline').textContent='ภาพการเงินเริ่มชัดขึ้นแล้ว';
+      $('#money-story-summary').textContent=`ตอนนี้มี ${state.transactions.length} รายการให้ใช้ดูแนวโน้ม ยิ่งบันทึกสม่ำเสมอ คุณก็ยิ่งเปรียบเทียบค่าใช้จ่ายและวางแผนช่วงที่เหลือของเดือนได้ง่ายขึ้น`;
+    }
+    $('#story-top-category').textContent=top?.[0]||'ยังไม่มีรายจ่าย';
+    $('#story-top-category-value').textContent=top?`${currency(top[1])} ในเดือนนี้`:'บันทึกรายจ่ายเพื่อเริ่มดูแนวโน้ม';
+    $('#story-pace-label').textContent='ประมาณการรายจ่ายสิ้นเดือน';
+    $('#story-pace-value').textContent=currency(projection);
+    $('#story-pace-note').textContent=`จากค่าเฉลี่ย ${currency(expense/Math.max(1,day))}/วัน ณ วันนี้`;
+  }
+  function renderDailySpendChart() {
+    const count=14,rows=[];const today=new Date();today.setHours(12,0,0,0);
+    for(let i=0;i<count;i++){
+      const d=new Date(today);d.setDate(today.getDate()-(count-1-i));const key=localISO(d);
+      const amount=state.transactions.filter(t=>t.date===key&&t.kind==='expense').reduce((sum,t)=>sum+(Number(t.amount)||0),0);
+      rows.push({date:key,day:d.getDate(),amount});
+    }
+    const chart=$('#daily-spend-chart'),max=Math.max(100,...rows.map(r=>r.amount)),baseY=126,topY=18,left=38,right=742,width=right-left;
+    const points=rows.map((r,i)=>({ ...r,x:left+i*(width/(count-1)),y:baseY-(r.amount/max)*(baseY-topY) }));
+    const line=points.map((p,i)=>`${i?'L':'M'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const area=`${line} L ${right} ${baseY} L ${left} ${baseY} Z`;
+    const grid=[.25,.5,.75,1].map(r=>{const y=baseY-(baseY-topY)*r;return `<line class="daily-grid-line" x1="${left}" y1="${y.toFixed(1)}" x2="${right}" y2="${y.toFixed(1)}"/><text class="daily-grid-label" x="3" y="${(y+4).toFixed(1)}">${escapeHTML(currency(max*r).replace('฿',''))}</text>`;}).join('');
+    const dots=points.map((p,i)=>`<circle class="daily-chart-point" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i===count-1?4.4:2.7}"><title>${escapeHTML(thaiDate(p.date,{day:'numeric',month:'short'}))}: ${escapeHTML(currency(p.amount))}</title></circle>`).join('');
+    const labels=points.map((p,i)=>i%3===0||i===count-1?`<text class="daily-x-label" x="${p.x.toFixed(1)}" y="158" text-anchor="middle">${p.day}</text>`:'').join('');
+    chart.innerHTML=`<svg viewBox="0 0 760 174" preserveAspectRatio="none" role="img" aria-label="กราฟรายจ่ายรายวันย้อนหลัง 14 วัน"><defs><linearGradient id="dailyAreaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#8e79ff" stop-opacity=".34"/><stop offset="100%" stop-color="#8e79ff" stop-opacity=".02"/></linearGradient></defs>${grid}<path class="daily-chart-area" d="${area}"/><path class="daily-chart-line" d="${line}"/>${dots}${labels}</svg>`;
+    const total=rows.reduce((sum,r)=>sum+r.amount,0),average=total/count,peak=rows.reduce((a,b)=>a.amount>=b.amount?a:b,rows[0]);
+    const previous=rows.slice(0,7).reduce((sum,r)=>sum+r.amount,0),recent=rows.slice(7).reduce((sum,r)=>sum+r.amount,0);
+    let trend='';
+    if(previous>0){const change=((recent-previous)/previous)*100;trend= Math.abs(change)<5?'ยอดรายจ่าย 7 วันล่าสุดใกล้เคียงกับสัปดาห์ก่อน':change>0?`รายจ่าย 7 วันล่าสุดเพิ่มขึ้น ${Math.round(change)}% จากช่วง 7 วันก่อน`:`รายจ่าย 7 วันล่าสุดลดลง ${Math.round(Math.abs(change))}% จากช่วง 7 วันก่อน`;}
+    else if(recent>0)trend='เริ่มมีข้อมูลรายจ่ายใน 7 วันล่าสุด ส่วนช่วงก่อนหน้านี้ยังไม่มีรายการ';
+    else trend='ยังไม่มีรายจ่ายที่บันทึกในช่วง 14 วันนี้';
+    const peakText=peak.amount?` วันที่มียอดสูงสุดคือ ${thaiDate(peak.date,{day:'numeric',month:'short'})} (${currency(peak.amount)})` : '';
+    $('#daily-spend-insight').textContent=`${trend}.${peakText} ใช้กราฟนี้เป็นสัญญาณให้กลับไปดูรายการได้ ไม่ใช่การตัดสินว่าคุณใช้เงินมากหรือน้อยเกินไป`;
+    $('#daily-spend-average').textContent=currency(average);
   }
   function renderTrendChart(container) {
     const data=getMonthTotalsHistory(),max=Math.max(1,...data.flatMap(d=>[d.income,d.expense]));
